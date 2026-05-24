@@ -1,61 +1,96 @@
 # CNN Models for Pet Facial Expression Classification
 
-A PyTorch-based notebook project demonstrating convolutional neural network training, evaluation, and model comparison for pet facial expression recognition.
+A PyTorch-based notebook project that trains and compares convolutional neural networks on pet facial expression data.
 
-## What this project contains
+## Project structure
 
-- `cnn (1).ipynb` — a Jupyter notebook with a full training and evaluation workflow.
-- Dataset download and organization using the Kaggle dataset `anshtanwar/pets-facial-expression-dataset`.
-- Data augmentation and preprocessing for image classification.
-- Multiple CNN model implementations:
-  - VGG16
-  - ResNet18
-  - MobileNetV1
-  - Inception-style architecture (Inception V3-inspired blocks)
-- Training utilities with early stopping, learning rate scheduling, and metrics logging.
-- Evaluation routines with accuracy, precision, recall, F1-score, classification report, and confusion matrix visualization.
+- `cnn.ipynb` — the main notebook containing the full workflow.
+- `README.md` — explains project goals, code structure, and how to use the notebook.
 
-## Key features
+## What this project does
 
-- Automated dataset download and local copy preparation.
-- Image transforms for robust training, including random resized crop, horizontal flip, rotation, affine transforms, color jitter, and blur.
-- Custom model definitions written from scratch.
-- Clear visualizations for class distribution and sample augmented images.
-- Model performance tracking and comparison.
+The notebook performs a complete image classification pipeline for a pet facial expression dataset:
 
-## Usage
+1. Downloads the dataset automatically from Kaggle using `kagglehub`.
+2. Applies reproducible setup and seeding for deterministic training behavior.
+3. Defines robust augmentation and normalization pipelines for training and evaluation.
+4. Loads train/validation/test datasets using `torchvision.datasets.ImageFolder`.
+5. Builds multiple CNN architectures from scratch.
+6. Trains models with early stopping and learning rate scheduling.
+7. Evaluates models using accuracy, precision, recall, F1 score, and confusion matrices.
+8. Compares models trained from scratch and optionally transfer learning models.
 
-1. Open `cnn (1).ipynb` in Jupyter or VS Code.
-2. Install required Python packages:
-   - `torch`
-   - `torchvision`
-   - `numpy`
-   - `matplotlib`
-   - `seaborn`
-   - `scikit-learn`
-   - `kagglehub`
-3. Run the notebook cells in order to download data, build models, train, and evaluate.
+## Code explanation
+
+### Notebook sections
+
+- **Dataset download**: Uses `kagglehub.dataset_download` to fetch the `anshtanwar/pets-facial-expression-dataset`, then copies it into a local `dataset` folder.
+- **Environment setup**: Imports required libraries and prints the available device (`cuda` or `cpu`).
+- **Reproducibility**: Sets seeds for Python, NumPy, and PyTorch and configures deterministic CuDNN behavior if a GPU is available.
+- **Data transforms**:
+  - `train_transform` includes random resized crop, horizontal flip, rotation, affine perturbations, color jitter, and random blur.
+  - `eval_transform` resizes images and normalizes them with ImageNet-style mean and standard deviation.
+- **Data loading**:
+  - `ImageFolder` is used for the train, validation, and test splits.
+  - `DataLoader` creates batched iterators with shuffling for training and deterministic ordering for validation/test.
+- **Dataset analysis**:
+  - Plots class distribution for the training split.
+  - Visualizes augmented image samples for each class.
+  - Prints per-split class counts.
+- **Training utilities**:
+  - `train_model()` runs each epoch, computes loss, evaluates on validation data, and applies early stopping.
+  - `evaluate_model()` computes final metrics on the test set and plots a confusion matrix.
+  - `plot_history()` visualizes training/validation loss and validation accuracy over epochs.
+
+### Models implemented
+
+- **VGG16**: A deep, sequential CNN using stacked 3×3 convolutions and max pooling. It is a classic baseline that emphasizes simplicity and depth.
+- **ResNet18**: Adds residual skip connections to improve gradient flow and training stability. ResNets are effective for deeper networks and help prevent vanishing gradients.
+- **MobileNetV1**: Uses depthwise separable convolutions to greatly reduce parameter count and compute cost. This model is designed for efficiency and is useful for mobile-style deployments.
+- **Inception V3-inspired architecture**: Implements Inception-style modules with parallel branches and factorized convolutions to capture multi-scale features.
+- **DenseNet121-inspired architecture**: Uses dense connectivity where each layer receives inputs from all previous layers, promoting feature reuse and efficient gradient flow.
+
+### Training and evaluation flow
+
+- The notebook configures hyperparameters such as epochs, learning rate, batch size, and early stopping patience.
+- Each model is trained using Adam optimizer, cross-entropy loss, and a learning rate scheduler that reduces the learning rate on plateau.
+- The best weights are restored after early stopping based on validation loss.
+- Final test metrics are printed and stored for comparison.
+
+### Transfer learning
+
+The notebook also includes an optional transfer learning experiment using pretrained models from `torchvision.models`:
+
+- ResNet18
+- DenseNet121
+- MobileNetV2
+- VGG16
+- InceptionV3
+
+These models are adapted by freezing backbone parameters and replacing the classifier layers with new output heads for the dataset classes.
+
+## Dependencies
+
+Install the following packages in your Python environment:
+
+- `torch`
+- `torchvision`
+- `numpy`
+- `matplotlib`
+- `seaborn`
+- `scikit-learn`
+- `kagglehub`
+
+## How to run
+
+1. Open `cnn.ipynb` in Jupyter or VS Code.
+2. Ensure dependencies are installed.
+3. Execute cells from top to bottom.
 
 ## Suggested improvements
 
-- Add a dedicated `requirements.txt` or `environment.yml`.
-- Refactor model classes and training functions into separate Python modules.
-- Add command-line training scripts and saved model checkpoints.
-- Experiment with pretrained backbones and transfer learning.
-
-## Suggested project names
-
-- `PetFaceCNN`
-- `FelineFaceNet`
-- `PawEmotionNet`
-- `PetExpressionAI`
-- `FurFaceClassifier`
-- `PetMoodVision`
-- `PawSenseCNN`
-- `ExpressionPaws`
-- `FacialFurNet`
-- `PetEmotionVision`
-
-## Notes
-
-The repository currently contains a single notebook and can be expanded into a more reusable package with dedicated modules and scripts.
+- Add `requirements.txt` or `environment.yml`.
+- Break the notebook into reusable Python modules, such as `data.py`, `models.py`, and `train.py`.
+- Save model checkpoints and log experiments.
+- Add a command-line interface for training and evaluation.
+- Add a README section summarizing results once models are run.
