@@ -86,11 +86,3 @@ Install the following packages in your Python environment:
 1. Open `cnn.ipynb` in Jupyter or VS Code.
 2. Ensure dependencies are installed.
 3. Execute cells from top to bottom.
-
-## Suggested improvements
-
-- Add `requirements.txt` or `environment.yml`.
-- Break the notebook into reusable Python modules, such as `data.py`, `models.py`, and `train.py`.
-- Save model checkpoints and log experiments.
-- Add a command-line interface for training and evaluation.
-- Add a README section summarizing results once models are run.
